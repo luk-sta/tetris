@@ -14,7 +14,7 @@ public class TetrisView {
     private final JFrame jFrame;
     private final Graphics2D graphics;
 
-    public TetrisView(Board board) {
+    public TetrisView(Board board, KeyListener keyListener) {
 //        var tetrisCanvas = new TetrisViewComponent();
 //        tetrisCanvas.setBackground(Color.WHITE);
         jFrame = new JFrame();
@@ -25,6 +25,7 @@ public class TetrisView {
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.getContentPane().setBackground(BACKGROUND_COLOR);
+        jFrame.addKeyListener(keyListener);
         //jFrame.setLayout(null);
         jFrame.setVisible(true);
         this.graphics = (Graphics2D) jFrame.getGraphics();
