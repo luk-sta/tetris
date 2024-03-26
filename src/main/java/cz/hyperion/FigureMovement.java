@@ -96,7 +96,7 @@ public class FigureMovement implements KeyStrokes {
         }
     }
 
-    private boolean newFigure(Figure newFigure) {
+    private synchronized boolean newFigure(Figure newFigure) {
         if (!board.isShapeInside(newFigure)) {
             return false;
         }

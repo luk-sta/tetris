@@ -45,6 +45,7 @@ public class TetrisGame {
                 }
                 figureMovement.perform(movingFigure);
             }
+            System.out.println("Points: " + board.getPoints());
         }
     }
 }

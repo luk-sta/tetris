@@ -7,6 +7,7 @@ import cz.hyperion.model.Position;
 import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 public class TetrisView implements AutoCloseable {
     private static final Color BACKGROUND_COLOR = Color.WHITE;
@@ -23,25 +24,15 @@ public class TetrisView implements AutoCloseable {
         jFrame.getContentPane().setBackground(BACKGROUND_COLOR);
         jFrame.setVisible(true);
         this.graphics = (Graphics2D) jFrame.getGraphics();
-        graphics.setColor(BACKGROUND_COLOR);
-        graphics.fillRect(0, 0, width, height);
+        RenderingHints rh = new RenderingHints(
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics.setRenderingHints(rh);
     }
 
     public void addKeyListener(KeyListener keyListener) {
         jFrame.addKeyListener(keyListener);
     }
-
-    //    public int getWidth() {
-    //        return width;
-    //    }
-    //
-    //    public int getHeight() {
-    //        return height;
-    //    }
-    //
-    //    public KeyListener getKeyListener() {
-    //        return keyListener;
-    //    }
 
     public void draw(Element element) {
         var c = element.getColor();
