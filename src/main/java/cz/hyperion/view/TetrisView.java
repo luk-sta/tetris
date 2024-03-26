@@ -1,9 +1,8 @@
 package cz.hyperion.view;
 
-import cz.hyperion.model.Board;
 import cz.hyperion.model.Element;
+import cz.hyperion.model.Figure;
 import cz.hyperion.model.Position;
-import cz.hyperion.model.Shape;
 
 import javax.swing.JFrame;
 import java.awt.Color;
@@ -14,24 +13,35 @@ public class TetrisView {
     private final JFrame jFrame;
     private final Graphics2D graphics;
 
-    public TetrisView(Board board, KeyListener keyListener) {
-//        var tetrisCanvas = new TetrisViewComponent();
-//        tetrisCanvas.setBackground(Color.WHITE);
+    public TetrisView(int width, int height) {
         jFrame = new JFrame();
         jFrame.setBackground(Color.WHITE);
-        //        jFrame.add(tetrisCanvas);
-        jFrame.setSize(board.getWidth(), board.getHeight());
+        jFrame.setSize(width, height);
         jFrame.setTitle("Tetris");
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.getContentPane().setBackground(BACKGROUND_COLOR);
-        jFrame.addKeyListener(keyListener);
-        //jFrame.setLayout(null);
         jFrame.setVisible(true);
         this.graphics = (Graphics2D) jFrame.getGraphics();
         graphics.setColor(BACKGROUND_COLOR);
-        graphics.fillRect(0, 0, board.getWidth(), board.getHeight());
+        graphics.fillRect(0, 0, width, height);
     }
+
+    public void addKeyListener(KeyListener keyListener) {
+        jFrame.addKeyListener(keyListener);
+    }
+
+    //    public int getWidth() {
+    //        return width;
+    //    }
+    //
+    //    public int getHeight() {
+    //        return height;
+    //    }
+    //
+    //    public KeyListener getKeyListener() {
+    //        return keyListener;
+    //    }
 
     public void draw(Element element) {
         var c = element.getColor();
@@ -44,18 +54,21 @@ public class TetrisView {
     }
 
     private void draw(Element element, Color color) {
+        if (element == null) {
+            return;
+        }
         Position position = element.getPosition();
         graphics.setColor(color);
         graphics.fillRect(position.x(), position.y(), Element.SIZE, Element.SIZE);
     }
 
-    public void draw(Shape shape) {
+    public void draw(Figure shape) {
         for (Element element : shape.getElements()) {
             draw(element);
         }
     }
 
-    public void clear(Shape shape) {
+    public void clear(Figure shape) {
         for (Element element : shape.getElements()) {
             clear(element);
         }

@@ -3,7 +3,7 @@ package cz.hyperion.model;
 import java.util.List;
 import java.util.function.Function;
 
-public class Shape {
+public class Figure {
 
     private final Element pivotElement;
 
@@ -11,7 +11,7 @@ public class Shape {
 
     private final List<Element> elements;
 
-    public Shape(Element pivotElement, List<ElementShift> otherElementPlacements) {
+    public Figure(Element pivotElement, List<ElementShift> otherElementPlacements) {
         this.pivotElement = pivotElement;
         this.otherElementPlacements = otherElementPlacements;
         this.elements = List.of(
@@ -22,7 +22,7 @@ public class Shape {
         );
     }
 
-    public Shape(Element pivotElement, ElementShift... otherElementPlacements) {
+    public Figure(Element pivotElement, ElementShift... otherElementPlacements) {
         this(pivotElement, List.of(otherElementPlacements));
     }
 
@@ -30,32 +30,32 @@ public class Shape {
         return elements;
     }
 
-    public Shape moveDown() {
+    public Figure moveDown() {
         return move(Element::moveDown);
     }
 
-    public Shape moveLeft() {
+    public Figure moveLeft() {
         return move(Element::moveLeft);
     }
 
-    public Shape moveRight() {
+    public Figure moveRight() {
         return move(Element::moveRight);
     }
 
-    private Shape move(Function<Element, Element> f) {
-        return new Shape(f.apply(pivotElement), otherElementPlacements);
+    private Figure move(Function<Element, Element> f) {
+        return new Figure(f.apply(pivotElement), otherElementPlacements);
     }
 
-    public Shape rotateLeft() {
+    public Figure rotateLeft() {
         return rotate(this::rotateLeft);
     }
 
-    public Shape rotateRight() {
+    public Figure rotateRight() {
         return rotate(this::rotateRight);
     }
 
-    private Shape rotate(Function<ElementShift, ElementShift> f) {
-        return new Shape(pivotElement, otherElementPlacements.stream().map(f).toList());
+    private Figure rotate(Function<ElementShift, ElementShift> f) {
+        return new Figure(pivotElement, otherElementPlacements.stream().map(f).toList());
     }
 
     private ElementShift rotateLeft(ElementShift elementShift) {

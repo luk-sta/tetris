@@ -1,47 +1,44 @@
 package cz.hyperion;
 
 import cz.hyperion.model.Board;
-import cz.hyperion.model.Shape;
+import cz.hyperion.model.Figure;
 import cz.hyperion.view.TetrisView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ShapeMove implements KeyStrokes {
+public class FigureMovement implements KeyStrokes {
     private final Board board;
     private final int slowness;
+    private final TetrisView tetrisView;
     private final AtomicInteger sleep;
 
-    private volatile Shape shape;
-    private TetrisView tetrisView;
+    private volatile Figure figure;
 
-    public ShapeMove(Board board, int slowness) {
+    public FigureMovement(Board board, int slowness) {
         this.board = board;
         this.slowness = slowness;
+        this.tetrisView = board.getView();
         sleep = new AtomicInteger(slowness);
-    }
-
-    public void setView(TetrisView tetrisView) {
-        this.tetrisView = tetrisView;
     }
 
     @Override
     public void keyLeft() {
-        newShape(shape.moveLeft());
+        newShape(figure.moveLeft());
     }
 
     @Override
     public void keyRight() {
-        newShape(shape.moveRight());
+        newShape(figure.moveRight());
     }
 
     @Override
     public void keyDown() {
-        newShape(shape.rotateRight());
+        newShape(figure.rotateRight());
     }
 
     @Override
     public void keyUp() {
-        newShape(shape.rotateLeft());
+        newShape(figure.rotateLeft());
     }
 
     @Override
@@ -54,26 +51,26 @@ public class ShapeMove implements KeyStrokes {
         sleep.set(slowness);
     }
 
-    public void move(Shape s) {
-        this.shape = s;
+    public void perform(Figure s) {
+        this.figure = s;
         do {
             try {
                 Thread.sleep(sleep.get());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        } while (newShape(shape.moveDown()));
+        } while (newShape(figure.moveDown()));
 
-        board.addShape(shape);
+        board.addShape(figure);
     }
 
-    private boolean newShape(Shape newShape) {
+    private boolean newShape(Figure newShape) {
         if (!board.isShapeInside(newShape)) {
             return false;
         }
-        tetrisView.clear(shape);
-        shape = newShape;
-        tetrisView.draw(shape);
+        tetrisView.clear(figure);
+        figure = newShape;
+        tetrisView.draw(figure);
         return true;
     }
 }
