@@ -1,75 +1,107 @@
 package cz.hyperion;
 
+import cz.hyperion.exception.FinishException;
+import cz.hyperion.exception.RestartException;
 import cz.hyperion.model.Board;
 import cz.hyperion.model.Figure;
 import cz.hyperion.view.TetrisView;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FigureMovement implements KeyStrokes {
     private final Board board;
-    private final int slowness;
+    private final int baseSlowness;
     private final TetrisView tetrisView;
     private final AtomicInteger sleep;
 
     private volatile Figure figure;
 
+    private final AtomicInteger running = new AtomicInteger(0);
+
+    private final AtomicBoolean pause = new AtomicBoolean(false);
+
     public FigureMovement(Board board, int slowness) {
         this.board = board;
-        this.slowness = slowness;
+        this.baseSlowness = slowness;
         this.tetrisView = board.getView();
         sleep = new AtomicInteger(slowness);
     }
 
     @Override
     public void keyLeft() {
-        newShape(figure.moveLeft());
+        newFigure(figure.moveLeft());
     }
 
     @Override
     public void keyRight() {
-        newShape(figure.moveRight());
+        newFigure(figure.moveRight());
     }
 
     @Override
     public void keyDown() {
-        newShape(figure.rotateRight());
+        newFigure(figure.rotateRight());
     }
 
     @Override
     public void keyUp() {
-        newShape(figure.rotateLeft());
+        newFigure(figure.rotateLeft());
     }
 
     @Override
     public void keySpaceOn() {
-        sleep.set(5);
+        sleep.set(3);
     }
 
     @Override
     public void keySpaceOff() {
-        sleep.set(slowness);
+        sleep.set(baseSlowness - board.getPoints());
     }
 
-    public void perform(Figure s) {
+    @Override
+    public void keyQuit() {
+        running.set(1);
+    }
+
+    @Override
+    public void keyPauseResume() {
+        pause.set(!pause.get());
+    }
+
+    @Override
+    public void keyNew() {
+        running.set(2);
+    }
+
+    public void perform(Figure s) throws InterruptedException {
         this.figure = s;
         do {
-            try {
-                Thread.sleep(sleep.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        } while (newShape(figure.moveDown()));
+            checkGameState();
+            Thread.sleep(sleep.get());
+        } while (newFigure(figure.moveDown()));
 
         board.addShape(figure);
+        sleep.set(baseSlowness - board.getPoints());
     }
 
-    private boolean newShape(Figure newShape) {
-        if (!board.isShapeInside(newShape)) {
+    private void checkGameState() throws InterruptedException {
+        switch (running.get()) {
+            case 1:
+                throw new FinishException();
+            case 2:
+                throw new RestartException();
+        }
+        while (pause.get()) {
+            Thread.sleep(100);
+        }
+    }
+
+    private boolean newFigure(Figure newFigure) {
+        if (!board.isShapeInside(newFigure)) {
             return false;
         }
         tetrisView.clear(figure);
-        figure = newShape;
+        figure = newFigure;
         tetrisView.draw(figure);
         return true;
     }

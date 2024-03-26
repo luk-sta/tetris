@@ -28,6 +28,10 @@ public class Board {
         return tetrisView;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public void addShape(Figure shape) {
         Set<Integer> rowIndexesSet = new HashSet<>();
         for (Element element : shape.getElements()) {
@@ -99,12 +103,26 @@ public class Board {
     }
 
     boolean isElementInside(Element element) {
-        if (element.position.x() < 0) {
+        int minX = element.position.x();
+        if (minX < 0) {
             return false;
         }
 
-        int c = getElementColumn(element);
-        int r = getElementRow(element);
+        int c = minX / Element.SIZE;
+        int r = element.position.y() / Element.SIZE;
+        if (!isInside(c, r)) {
+            return false;
+        }
+
+        c = getElementColumn(element);
+        r = getElementRow(element);
+        if (!isInside(c, r)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isInside(int c, int r) {
         if (c < 0 || c >= elementColumnCount || r < 0 || r >= elementRowCount) {
             return false;
         }

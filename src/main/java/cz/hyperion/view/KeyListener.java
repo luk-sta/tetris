@@ -33,6 +33,16 @@ public class KeyListener implements java.awt.event.KeyListener {
             case KeyEvent.VK_SPACE:
                 keyStrokes.keySpaceOn();
                 break;
+            case KeyEvent.VK_ESCAPE:
+            case KeyEvent.VK_Q:
+                keyStrokes.keyQuit();
+                break;
+            case KeyEvent.VK_P:
+                keyStrokes.keyPauseResume();
+                break;
+            case KeyEvent.VK_N:
+                keyStrokes.keyNew();
+                break;
         }
     }
 

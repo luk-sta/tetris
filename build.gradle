@@ -33,6 +33,6 @@ test {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "cz.hyperion.Tetris"
+        attributes["Main-Class"] = "cz.hyperion.TetrisGame"
     }
 }

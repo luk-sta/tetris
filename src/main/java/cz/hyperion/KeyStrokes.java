@@ -13,4 +13,10 @@ public interface KeyStrokes {
 
     void keySpaceOff();
 
+    void keyQuit();
+
+    void keyPauseResume();
+
+    void keyNew();
+
 }

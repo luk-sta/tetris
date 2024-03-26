@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-public class TetrisView {
+public class TetrisView implements AutoCloseable {
     private static final Color BACKGROUND_COLOR = Color.WHITE;
     private final JFrame jFrame;
     private final Graphics2D graphics;
@@ -16,7 +16,7 @@ public class TetrisView {
     public TetrisView(int width, int height) {
         jFrame = new JFrame();
         jFrame.setBackground(Color.WHITE);
-        jFrame.setSize(width, height);
+        jFrame.setSize(width, height + 5);
         jFrame.setTitle("Tetris");
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,7 +45,7 @@ public class TetrisView {
 
     public void draw(Element element) {
         var c = element.getColor();
-        var color = new Color(c.r(), c.g(), c.b());
+        var color = new Color(c.r(), c.g(), c.b()).darker();
         draw(element, color);
     }
 
@@ -72,5 +72,9 @@ public class TetrisView {
         for (Element element : shape.getElements()) {
             clear(element);
         }
+    }
+
+    public void close() {
+        jFrame.dispose();
     }
 }
