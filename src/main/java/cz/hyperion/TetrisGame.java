@@ -40,7 +40,7 @@ public class TetrisGame {
             while (true) {
                 var initialPosition = new Position((boardSize.getWidth()) / 2, 40);
                 var movingFigure = FigureFactory.random(initialPosition);
-                if (!board.isShapeInside(movingFigure)) {
+                if (!board.isFigureInside(movingFigure)) {
                     break;
                 }
                 figureMovement.perform(movingFigure);

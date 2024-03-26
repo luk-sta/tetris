@@ -80,7 +80,7 @@ public class FigureMovement implements KeyStrokes {
             Thread.sleep(sleep.get());
         } while (newFigure(figure.moveDown()));
 
-        board.addShape(figure);
+        board.addFigure(figure);
         sleep.set(baseSlowness - board.getPoints());
     }
 
@@ -97,7 +97,7 @@ public class FigureMovement implements KeyStrokes {
     }
 
     private synchronized boolean newFigure(Figure newFigure) {
-        if (!board.isShapeInside(newFigure)) {
+        if (!board.isFigureInside(newFigure)) {
             return false;
         }
         tetrisView.clear(figure);

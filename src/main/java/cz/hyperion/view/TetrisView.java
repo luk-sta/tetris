@@ -53,14 +53,14 @@ public class TetrisView implements AutoCloseable {
         graphics.fillRect(position.x(), position.y(), Element.SIZE, Element.SIZE);
     }
 
-    public void draw(Figure shape) {
-        for (Element element : shape.getElements()) {
+    public void draw(Figure figure) {
+        for (Element element : figure.getElements()) {
             draw(element);
         }
     }
 
-    public void clear(Figure shape) {
-        for (Element element : shape.getElements()) {
+    public void clear(Figure figure) {
+        for (Element element : figure.getElements()) {
             clear(element);
         }
     }

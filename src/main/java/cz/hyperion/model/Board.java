@@ -32,9 +32,9 @@ public class Board {
         return points;
     }
 
-    public void addShape(Figure shape) {
+    public void addFigure(Figure figure) {
         Set<Integer> rowIndexesSet = new HashSet<>();
-        for (Element element : shape.getElements()) {
+        for (Element element : figure.getElements()) {
             int r = addElement(element);
             rowIndexesSet.add(r);
         }
@@ -86,8 +86,8 @@ public class Board {
         }
     }
 
-    public boolean isShapeInside(Figure shape) {
-        return shape.getElements().stream().allMatch(this::isElementInside);
+    public boolean isFigureInside(Figure figure) {
+        return figure.getElements().stream().allMatch(this::isElementInside);
     }
 
     private int getElementRow(Element element) {
