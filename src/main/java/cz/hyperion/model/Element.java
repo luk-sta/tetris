@@ -5,7 +5,7 @@ public class Element {
     final Position position;
     final Color color;
 
-    Element(Position position, Color color) {
+    public Element(Position position, Color color) {
         this.position = position;
         this.color = color;
     }
@@ -19,7 +19,7 @@ public class Element {
     }
 
     public Element moveDown() {
-        return new Element(new Position(this.position.x(), this.position.y() + 1), this.color);
+        return new Element(new Position(this.position.x(), this.position.y() + 4), this.color);
     }
 
     public Element moveLeft() {
@@ -28,5 +28,13 @@ public class Element {
 
     public Element moveRight() {
         return new Element(this, ElementShift.SHIFT_RIGHT);
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

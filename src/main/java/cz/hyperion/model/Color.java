@@ -1,11 +1,11 @@
 package cz.hyperion.model;
 
-public record Color(byte r, byte g, byte b) {
+public record Color(short r, short g, short b) {
     public Color() {
         this(random(), random(), random());
     }
 
-    private static byte random() {
-        return (byte) (Math.random() * 200 + 20);
+    private static short random() {
+        return (short) (Math.random() * 200 + 20);
     }
 }

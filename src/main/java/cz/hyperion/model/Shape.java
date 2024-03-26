@@ -1,44 +1,33 @@
 package cz.hyperion.model;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class Shape {
-    protected List<Element> elements;
+public class Shape {
 
-    protected Shape(List<Element> elements) {
-        this.elements = elements;
-    }
+    private final Element pivotElement;
 
-    protected Shape(Element... elements) {
-        this(List.of(elements));
-    }
+    private final List<ElementShift> otherElementPlacements;
 
-    protected Element e0() {
-        return elements.get(0);
-    }
+    private final List<Element> elements;
 
-    protected Element e1() {
-        return elements.get(1);
-    }
-
-    protected Element e2() {
-        return elements.get(2);
-    }
-
-    protected Element e3() {
-        return elements.get(3);
-    }
-
-    protected List<Element> transform(ElementShift... elementShifts) {
-        return List.of(
-                new Element(e0(), elementShifts[0]),
-                new Element(e1(), elementShifts[1]),
-                new Element(e2(), elementShifts[2]),
-                new Element(e3(), elementShifts[3])
+    public Shape(Element pivotElement, List<ElementShift> otherElementPlacements) {
+        this.pivotElement = pivotElement;
+        this.otherElementPlacements = otherElementPlacements;
+        this.elements = List.of(
+                pivotElement,
+                new Element(pivotElement, otherElementPlacements.get(0)),
+                new Element(pivotElement, otherElementPlacements.get(1)),
+                new Element(pivotElement, otherElementPlacements.get(2))
         );
+    }
+
+    public Shape(Element pivotElement, ElementShift... otherElementPlacements) {
+        this(pivotElement, List.of(otherElementPlacements));
+    }
+
+    public List<Element> getElements() {
+        return elements;
     }
 
     public Shape moveDown() {
@@ -53,22 +42,28 @@ public abstract class Shape {
         return move(Element::moveRight);
     }
 
-    private List<Element> moveElements(Function<Element, Element> f) {
-        return elements.stream().map(f).toList();
-    }
-
     private Shape move(Function<Element, Element> f) {
-        try {
-            List<Element> elements = moveElements(f);
-            Constructor constructor = this.getClass().getConstructor(List.class);
-            return (Shape) constructor.newInstance(elements);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return new Shape(f.apply(pivotElement), otherElementPlacements);
     }
 
-    public abstract Shape rotateLeft();
+    public Shape rotateLeft() {
+        return rotate(this::rotateLeft);
+    }
 
-    public abstract Shape rotateRight();
+    public Shape rotateRight() {
+        return rotate(this::rotateRight);
+    }
+
+    private Shape rotate(Function<ElementShift, ElementShift> f) {
+        return new Shape(pivotElement, otherElementPlacements.stream().map(f).toList());
+    }
+
+    private ElementShift rotateLeft(ElementShift elementShift) {
+        return new ElementShift(elementShift.down(), -1 * elementShift.right());
+    }
+
+    private ElementShift rotateRight(ElementShift elementShift) {
+        return new ElementShift(-1 * elementShift.down(), elementShift.right());
+    }
+
 }
