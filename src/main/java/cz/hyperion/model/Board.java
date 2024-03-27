@@ -43,6 +43,7 @@ public class Board {
         int shift = 0;
         for (Integer rowIndex : rowIndexes) {
             int r = rowIndex + shift;
+            //System.out.println("Row index: " + r);
             if (isRowFull(elements[r])) {
                 moveRowsDown(r);
                 points += 1;
@@ -50,6 +51,7 @@ public class Board {
                 shift += 1;
             }
         }
+        //System.out.println("___");
     }
 
     int addElement(Element element) {
@@ -71,13 +73,14 @@ public class Board {
     private void moveRowsDown(int fromRow) {
         for (int r = fromRow; r > 0; r--) {
             for (int c = 0; c < elementColumnCount; c++) {
+                Element oldElement = elements[r][c];
+                tetrisView.clear(oldElement);
                 Element e = elements[r - 1][c];
                 if (e == null) {
-                    Element oldElement = elements[r][c];
-                    tetrisView.clear(oldElement);
                     elements[r][c] = null;
                     continue;
                 }
+                elements[r - 1][c] = null;
                 tetrisView.clear(e);
                 Element newElement = new Element(e, ElementShift.SHIFT_DOWN);
                 tetrisView.draw(newElement);

@@ -14,7 +14,7 @@ class GameContext implements KeyStrokes {
     private final Board board;
     private final AtomicInteger sleep;
     private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
-    final AtomicReference<Function<Figure, Figure>> lastRequestedAction = new AtomicReference<>();
+    private final AtomicReference<Function<Figure, Figure>> lastRequestedAction = new AtomicReference<>();
     private final int baseSlowness;
 
     GameContext(Board board, int slowness) {
