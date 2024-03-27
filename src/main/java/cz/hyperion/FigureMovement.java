@@ -4,8 +4,6 @@ import cz.hyperion.model.Board;
 import cz.hyperion.model.Figure;
 import cz.hyperion.view.TetrisView;
 
-import java.util.function.Function;
-
 class FigureMovement {
     private final Board board;
     private final GameContext gameContext;
@@ -31,7 +29,7 @@ class FigureMovement {
     }
 
     private boolean move() {
-        Function<Figure, Figure> action = gameContext.getRequestedAction();
+        FigureAction action = gameContext.getRequestedAction();
         if (action != null) {
             if (tryNewPlacement(action.apply(figure))) {
                 gameContext.clearRequestedAction();

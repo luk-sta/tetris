@@ -14,7 +14,7 @@ class GameContext implements KeyStrokes {
     private final Board board;
     private final AtomicInteger sleep;
     private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
-    private final AtomicReference<Function<Figure, Figure>> lastRequestedAction = new AtomicReference<>();
+    private final AtomicReference<FigureAction> lastRequestedAction = new AtomicReference<>();
     private final int baseSlowness;
 
     GameContext(Board board, int slowness) {
@@ -32,22 +32,26 @@ class GameContext implements KeyStrokes {
 
     @Override
     public void keyLeft() {
-        lastRequestedAction.set(Figure::moveLeft);
+        setAction(Figure::moveLeft);
     }
 
     @Override
     public void keyRight() {
-        lastRequestedAction.set(Figure::moveRight);
+        setAction(Figure::moveRight);
     }
 
     @Override
     public void keyDown() {
-        lastRequestedAction.set(Figure::rotateRight);
+        setAction(Figure::rotateRight);
     }
 
     @Override
     public void keyUp() {
-        lastRequestedAction.set(Figure::rotateLeft);
+        setAction(Figure::rotateLeft);
+    }
+
+    private void setAction(Function<Figure, Figure> actionFunction) {
+        lastRequestedAction.set(new FigureAction(actionFunction));
     }
 
     @Override
@@ -97,12 +101,19 @@ class GameContext implements KeyStrokes {
     int getSleep() {
         return sleep.get();
     }
-
-    Function<Figure, Figure> getRequestedAction(){
-        return lastRequestedAction.get();
+    FigureAction getRequestedAction() {
+        FigureAction figureAction= lastRequestedAction.get();
+        if(figureAction==null){
+            return null;
+        }
+        if(figureAction.isStale()) {
+            lastRequestedAction.set(null);
+            return null;
+        }
+        return figureAction;
     }
 
-    void clearRequestedAction(){
+    void clearRequestedAction() {
         lastRequestedAction.set(null);
     }
 }
