@@ -6,8 +6,8 @@ import cz.hyperion.model.Board;
 import cz.hyperion.model.Figure;
 import cz.hyperion.view.TetrisView;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class FigureMovement implements KeyStrokes {
     private final Board board;
@@ -17,9 +17,16 @@ public class FigureMovement implements KeyStrokes {
 
     private volatile Figure figure;
 
-    private final AtomicInteger running = new AtomicInteger(0);
+    private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
 
-    private final AtomicBoolean pause = new AtomicBoolean(false);
+    //    private final AtomicBoolean pause = new AtomicBoolean(false);
+
+    private enum State {
+        RUNNING,
+        PAUSED,
+        FINISHED,
+        RESTART
+    }
 
     public FigureMovement(Board board, int slowness) {
         this.board = board;
@@ -50,7 +57,7 @@ public class FigureMovement implements KeyStrokes {
 
     @Override
     public void keySpaceOn() {
-        sleep.set(3);
+        sleep.set(1);
     }
 
     @Override
@@ -60,17 +67,20 @@ public class FigureMovement implements KeyStrokes {
 
     @Override
     public void keyQuit() {
-        running.set(1);
+        state.set(State.FINISHED);
     }
 
     @Override
     public void keyPauseResume() {
-        pause.set(!pause.get());
+        switch (state.get()) {
+            case PAUSED -> state.set(State.RUNNING);
+            case RUNNING -> state.set(State.PAUSED);
+        }
     }
 
     @Override
     public void keyNew() {
-        running.set(2);
+        state.set(State.RESTART);
     }
 
     public void perform(Figure s) throws InterruptedException {
@@ -85,19 +95,20 @@ public class FigureMovement implements KeyStrokes {
     }
 
     private void checkGameState() throws InterruptedException {
-        switch (running.get()) {
-            case 1:
-                throw new FinishException();
-            case 2:
-                throw new RestartException();
-        }
-        while (pause.get()) {
-            Thread.sleep(100);
+        boolean wait = true;
+        while (wait) {
+            switch (state.get()) {
+                case RUNNING -> wait = false;
+                case PAUSED -> Thread.sleep(100);
+                case RESTART -> throw new RestartException();
+                case FINISHED -> throw new FinishException();
+            }
         }
     }
 
-    private synchronized boolean newFigure(Figure newFigure) {
+    private boolean newFigure(Figure newFigure) {
         if (!board.isFigureInside(newFigure)) {
+//            System.out.println("New figure not inside.");
             return false;
         }
         tetrisView.clear(figure);

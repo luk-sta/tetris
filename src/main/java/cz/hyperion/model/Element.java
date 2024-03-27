@@ -23,7 +23,7 @@ public class Element {
     }
 
     public Element moveDown() {
-        return new Element(new Position(this.position.x(), this.position.y() + 4), this.color);
+        return new Element(new Position(this.position.x(), this.position.y() + 1), this.color);
     }
 
     public Element moveLeft() {

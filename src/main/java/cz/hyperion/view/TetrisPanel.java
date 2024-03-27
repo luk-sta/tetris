@@ -6,11 +6,12 @@ import cz.hyperion.model.Position;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 class TetrisPanel extends JPanel {
-    final Map<String, Element> elements = new HashMap<>();
+    final Map<String, Element> elements = Collections.synchronizedMap(new HashMap<>());
     @Override
     public void paintComponent(Graphics g) {
                 super.paintComponent(g);

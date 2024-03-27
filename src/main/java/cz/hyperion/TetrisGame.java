@@ -34,7 +34,7 @@ public class TetrisGame {
     private void run() throws InterruptedException {
         try (var tetrisView = new TetrisView(boardSize.getWidth(), boardSize.getHeight())) {
             Board board = new Board(boardSize, tetrisView);
-            FigureMovement figureMovement = new FigureMovement(board, 50);
+            FigureMovement figureMovement = new FigureMovement(board, 20);
             KeyListener keyListener = new KeyListener(figureMovement);
             tetrisView.addKeyListener(keyListener);
             while (true) {
