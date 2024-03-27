@@ -18,6 +18,7 @@ public class TetrisGame {
 
     public static void main(String[] args) throws InterruptedException {
         System.setProperty("sun.java2d.opengl", "true");
+        SoundUtil.playGameStart();
         TetrisGame tetrisGame = new TetrisGame();
         while (true) {
             try {

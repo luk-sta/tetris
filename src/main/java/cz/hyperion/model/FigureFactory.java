@@ -1,79 +1,48 @@
 package cz.hyperion.model;
 
+import java.util.Collection;
+import java.util.List;
+
 public final class FigureFactory {
-    public static Figure iShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(0, -2),
-                new ElementShift(0, -1),
-                new ElementShift(0, 1)
-        );
-    }
 
-    public static Figure oShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(1, 0),
-                new ElementShift(0, 1),
-                new ElementShift(1, 1)
-        );
-    }
+    private static final Collection<ElementShift> ISHAPE =
+            List.of(new ElementShift(0, -2), new ElementShift(0, -1), new ElementShift(0, 1));
+    private static final Collection<ElementShift> OSHAPE =
+            List.of(new ElementShift(1, 0), new ElementShift(0, 1), new ElementShift(1, 1));
+    private static final Collection<ElementShift> LSHAPE =
+            List.of(new ElementShift(0, -2), new ElementShift(0, -1), new ElementShift(1, 0));
+    private static final Collection<ElementShift> JSHAPE =
+            List.of(new ElementShift(0, -2), new ElementShift(0, -1), new ElementShift(-1, 0));
+    private static final Collection<ElementShift> ZSHAPE =
+            List.of(new ElementShift(-1, 0), new ElementShift(0, 1), new ElementShift(1, 1));
+    private static final Collection<ElementShift> SSHAPE =
+            List.of(new ElementShift(1, 0), new ElementShift(0, 1), new ElementShift(-1, 1));
+    private static final Collection<ElementShift> ESHAPE =
+            List.of(new ElementShift(0, -1), new ElementShift(1, 0), new ElementShift(0, 1));
+    //    private static final Collection<ElementShift> PSHAPE =
+    //            List.of(new ElementShift(0, -1), new ElementShift(1, 0), new ElementShift(0, 1), new ElementShift
+    //            (-1, 0));
+    private static final Collection<ElementShift> CSHAPE =
+            List.of(new ElementShift(0, -1), new ElementShift(1, -1), new ElementShift(0, 1), new ElementShift(1, 1));
 
-    public static Figure lShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(0, -2),
-                new ElementShift(0, -1),
-                new ElementShift(1, 0)
-        );
-    }
 
-    public static Figure jShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(0, -2),
-                new ElementShift(0, -1),
-                new ElementShift(-1, 0)
-        );
-    }
-
-    public static Figure zShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(-1, 0),
-                new ElementShift(0, 1),
-                new ElementShift(1, 1)
-        );
-    }
-
-    public static Figure sShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(1, 0),
-                new ElementShift(0, 1),
-                new ElementShift(-1, 1)
-        );
-    }
-
-    public static Figure eShape(Position position, Color color) {
-        return new Figure(new Element(position, color),
-                new ElementShift(0, -1),
-                new ElementShift(1, 0),
-                new ElementShift(0, 1)
-        );
-    }
+    private static final List<Collection<ElementShift>> SHAPE_SHIFTS = List.of(
+            ISHAPE, OSHAPE, LSHAPE, JSHAPE, ZSHAPE, SSHAPE, ESHAPE,
+            //PSHAPE,
+            CSHAPE
+    );
 
     public static Figure random(Position position) {
         Color color = new Color();
-        Figure s = switch ((int) (Math.random() * 7)) {
-            case 0 -> iShape(position, color);
-            case 1 -> oShape(position, color);
-            case 2 -> lShape(position, color);
-            case 3 -> jShape(position, color);
-            case 4 -> zShape(position, color);
-            case 5 -> sShape(position, color);
-            case 6 -> eShape(position, color);
-            default -> throw new IllegalStateException("Unexpected value: " + (int) (Math.random() * 7));
-        };
+        int index = (int) (Math.random() * SHAPE_SHIFTS.size());
+        Collection<ElementShift> elementShifts = SHAPE_SHIFTS.get(index);
+        Figure f = new Figure(new Element(position, color), elementShifts);
+
         int rotations = (int) (Math.random() * 4);
         for (int i = 0; i < rotations; i++) {
-            s = s.rotateRight();
+            f = f.rotateRight();
         }
-        return s;
+        return f;
     }
 
 }

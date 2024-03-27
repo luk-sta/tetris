@@ -31,6 +31,7 @@ class FigureMovement {
 
         board.addFigure(figure);
         gameContext.refreshSleep();
+        SoundUtil.playBottomTap();
         return true;
     }
 

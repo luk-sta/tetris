@@ -1,5 +1,7 @@
 package cz.hyperion.model;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -7,19 +9,15 @@ public class Figure {
 
     private final Element pivotElement;
 
-    private final List<ElementShift> otherElementPlacements;
+    private final Collection<ElementShift> otherElementPlacements;
 
     private final List<Element> elements;
 
-    public Figure(Element pivotElement, List<ElementShift> otherElementPlacements) {
+    public Figure(Element pivotElement, Collection<ElementShift> otherElementPlacements) {
         this.pivotElement = pivotElement;
         this.otherElementPlacements = otherElementPlacements;
-        this.elements = List.of(
-                pivotElement,
-                new Element(pivotElement, otherElementPlacements.get(0)),
-                new Element(pivotElement, otherElementPlacements.get(1)),
-                new Element(pivotElement, otherElementPlacements.get(2))
-        );
+        this.elements = new LinkedList<>(List.of(pivotElement));
+        elements.addAll(otherElementPlacements.stream().map(es -> new Element(pivotElement, es)).toList());
     }
 
     public Figure(Element pivotElement, ElementShift... otherElementPlacements) {

@@ -1,5 +1,6 @@
 package cz.hyperion.model;
 
+import cz.hyperion.SoundUtil;
 import cz.hyperion.view.TetrisView;
 
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class Board {
             }
         }
         tetrisView.repaint();
+        SoundUtil.playRowDone();
     }
 
     public boolean isFigureInside(Figure figure) {
