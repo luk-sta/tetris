@@ -95,18 +95,20 @@ class GameContext implements KeyStrokes {
     }
 
     void refreshSleep() {
-        sleep.set(baseSlowness - board.getPoints());
+        int s = Math.max(4, baseSlowness - board.getPoints() / 3);
+        sleep.set(s);
     }
 
     int getSleep() {
         return sleep.get();
     }
+
     FigureAction getRequestedAction() {
-        FigureAction figureAction= lastRequestedAction.get();
-        if(figureAction==null){
+        FigureAction figureAction = lastRequestedAction.get();
+        if (figureAction == null) {
             return null;
         }
-        if(figureAction.isStale()) {
+        if (figureAction.isStale()) {
             lastRequestedAction.set(null);
             return null;
         }

@@ -4,6 +4,7 @@ import cz.hyperion.exception.FinishException;
 import cz.hyperion.exception.RestartException;
 import cz.hyperion.model.Board;
 import cz.hyperion.model.BoardSize;
+import cz.hyperion.model.Element;
 import cz.hyperion.model.FigureFactory;
 import cz.hyperion.model.Position;
 import cz.hyperion.view.KeyListener;
@@ -39,7 +40,7 @@ public class TetrisGame {
             KeyListener keyListener = new KeyListener(gameContext);
             tetrisView.addKeyListener(keyListener);
             while (true) {
-                var initialPosition = new Position((boardSize.getWidth()) / 2, 40);
+                var initialPosition = getInitialPosition();
                 var movingFigure = FigureFactory.random(initialPosition);
                 if (!board.isFigureInside(movingFigure)) {
                     break;
@@ -48,5 +49,11 @@ public class TetrisGame {
             }
             System.out.println("Points: " + board.getPoints());
         }
+    }
+
+    private Position getInitialPosition() {
+        int x = (boardSize.getWidth()) / 2 + (int) ((Math.random() - 0.5d) * 6) * Element.SIZE;
+        //System.out.println(x);
+        return new Position(x, 40);
     }
 }
