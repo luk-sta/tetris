@@ -1,120 +1,46 @@
 package cz.hyperion;
 
-import cz.hyperion.exception.FinishException;
-import cz.hyperion.exception.RestartException;
 import cz.hyperion.model.Board;
 import cz.hyperion.model.Figure;
 import cz.hyperion.view.TetrisView;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-public class FigureMovement implements KeyStrokes {
+class FigureMovement {
     private final Board board;
-    private final int baseSlowness;
+    private final GameContext gameContext;
     private final TetrisView tetrisView;
-    private final AtomicInteger sleep;
 
     private volatile Figure figure;
 
-    private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
-    private final AtomicReference<Function<Figure, Figure>> lastRequestedAction = new AtomicReference<>();
-
-    private enum State {
-        RUNNING,
-        PAUSED,
-        FINISHED,
-        RESTART
-    }
-
-    public FigureMovement(Board board, int slowness) {
+    FigureMovement(Board board, GameContext gameContext) {
         this.board = board;
-        this.baseSlowness = slowness;
+        this.gameContext = gameContext;
         this.tetrisView = board.getView();
-        sleep = new AtomicInteger(slowness);
     }
 
-    @Override
-    public void keyLeft() {
-        lastRequestedAction.set(Figure::moveLeft);
-    }
-
-    @Override
-    public void keyRight() {
-        lastRequestedAction.set(Figure::moveRight);
-    }
-
-    @Override
-    public void keyDown() {
-        lastRequestedAction.set(Figure::rotateRight);
-    }
-
-    @Override
-    public void keyUp() {
-        lastRequestedAction.set(Figure::rotateLeft);
-    }
-
-    @Override
-    public void keySpaceOn() {
-        sleep.set(1);
-    }
-
-    @Override
-    public void keySpaceOff() {
-        sleep.set(baseSlowness - board.getPoints());
-    }
-
-    @Override
-    public void keyQuit() {
-        state.set(State.FINISHED);
-    }
-
-    @Override
-    public void keyPauseResume() {
-        switch (state.get()) {
-            case PAUSED -> state.set(State.RUNNING);
-            case RUNNING -> state.set(State.PAUSED);
-        }
-    }
-
-    @Override
-    public void keyNew() {
-        state.set(State.RESTART);
-    }
-
-    public void perform(Figure s) throws InterruptedException {
+    void perform(Figure s) throws InterruptedException {
         this.figure = s;
         do {
-            checkGameState();
-            Thread.sleep(sleep.get());
+            gameContext.checkGameState();
+            Thread.sleep(gameContext.getSleep());
         } while (move());
 
         board.addFigure(figure);
-        sleep.set(baseSlowness - board.getPoints());
+        gameContext.refreshSleep();
     }
 
     private boolean move() {
-        Function<Figure, Figure> action = lastRequestedAction.getAndSet(null);
+        Function<Figure, Figure> action = gameContext.getRequestedAction();
         if (action != null) {
-            newFigure(action.apply(figure));
-        }
-        return newFigure(figure.moveDown());
-    }
-
-    private void checkGameState() throws InterruptedException {
-        boolean wait = true;
-        while (wait) {
-            switch (state.get()) {
-                case RUNNING -> wait = false;
-                case PAUSED -> Thread.sleep(100);
-                case RESTART -> throw new RestartException();
-                case FINISHED -> throw new FinishException();
+            if (tryNewPlacement(action.apply(figure))) {
+                gameContext.clearRequestedAction();
             }
         }
+        return tryNewPlacement(figure.moveDown());
     }
 
-    private boolean newFigure(Figure newFigure) {
+    private boolean tryNewPlacement(Figure newFigure) {
         if (!board.isFigureInside(newFigure)) {
             //            System.out.println("New figure not inside.");
             return false;

@@ -34,8 +34,9 @@ public class TetrisGame {
     private void run() throws InterruptedException {
         try (var tetrisView = new TetrisView(boardSize.getWidth(), boardSize.getHeight())) {
             Board board = new Board(boardSize, tetrisView);
-            FigureMovement figureMovement = new FigureMovement(board, 20);
-            KeyListener keyListener = new KeyListener(figureMovement);
+            GameContext gameContext = new GameContext(board, 20);
+            FigureMovement figureMovement = new FigureMovement(board, gameContext);
+            KeyListener keyListener = new KeyListener(gameContext);
             tetrisView.addKeyListener(keyListener);
             while (true) {
                 var initialPosition = new Position((boardSize.getWidth()) / 2, 40);
