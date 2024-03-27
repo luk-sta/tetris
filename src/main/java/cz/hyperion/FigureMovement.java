@@ -2,6 +2,8 @@ package cz.hyperion;
 
 import cz.hyperion.model.Board;
 import cz.hyperion.model.Figure;
+import cz.hyperion.model.FigureFactory;
+import cz.hyperion.model.Position;
 import cz.hyperion.view.TetrisView;
 
 class FigureMovement {
@@ -17,8 +19,11 @@ class FigureMovement {
         this.tetrisView = board.getView();
     }
 
-    void perform(Figure s) throws InterruptedException {
-        this.figure = s;
+    boolean perform(Position initialPosition) throws InterruptedException {
+        this.figure = FigureFactory.random(initialPosition);
+        if (!board.isFigureInside(figure)) {
+            return false;
+        }
         do {
             gameContext.checkGameState();
             Thread.sleep(gameContext.getSleep());
@@ -26,6 +31,7 @@ class FigureMovement {
 
         board.addFigure(figure);
         gameContext.refreshSleep();
+        return true;
     }
 
     private boolean move() {

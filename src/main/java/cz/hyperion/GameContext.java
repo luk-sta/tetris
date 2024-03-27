@@ -72,8 +72,8 @@ class GameContext implements KeyStrokes {
     @Override
     public void keyPauseResume() {
         switch (state.get()) {
-            case PAUSED -> state.set(State.RUNNING);
-            case RUNNING -> state.set(State.PAUSED);
+            case PAUSED -> {System.out.println("Unpaused."); state.set(State.RUNNING);}
+            case RUNNING -> {System.out.println("Paused."); state.set(State.PAUSED);}
         }
     }
 
