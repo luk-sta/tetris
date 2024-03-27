@@ -8,13 +8,18 @@ import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TetrisView implements AutoCloseable {
     private static final Color BACKGROUND_COLOR = Color.WHITE;
     private final JFrame jFrame;
     private final Graphics2D graphics;
 
+    private final TetrisPanel tetrisPanel;
+
     public TetrisView(int width, int height) {
+        this.tetrisPanel = new TetrisPanel();
         jFrame = new JFrame();
         jFrame.setBackground(Color.WHITE);
         jFrame.setSize(width, height + 5);
@@ -22,8 +27,10 @@ public class TetrisView implements AutoCloseable {
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.getContentPane().setBackground(BACKGROUND_COLOR);
+        tetrisPanel.setBackground(BACKGROUND_COLOR);
         jFrame.setVisible(true);
-        this.graphics = (Graphics2D) jFrame.getGraphics();
+        jFrame.add(tetrisPanel);
+        this.graphics = (Graphics2D) tetrisPanel.getGraphics();
         RenderingHints rh = new RenderingHints(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -35,23 +42,21 @@ public class TetrisView implements AutoCloseable {
     }
 
     public void draw(Element element) {
-        var c = element.getColor();
-        var color = new Color(c.r(), c.g(), c.b()).darker();
-        draw(element, color);
+        tetrisPanel.elements.put(element.getId(), element);
     }
 
     public void clear(Element element) {
-        draw(element, BACKGROUND_COLOR);
+        tetrisPanel.elements.remove(element.getId());
     }
 
-    private void draw(Element element, Color color) {
-        if (element == null) {
-            return;
-        }
-        Position position = element.getPosition();
-        graphics.setColor(color);
-        graphics.fillRect(position.x(), position.y(), Element.SIZE, Element.SIZE);
-    }
+    //    private void draw(Element element, Color color) {
+    //        if (element == null) {
+    //            return;
+    //        }
+    //        Position position = element.getPosition();
+    //        graphics.setColor(color);
+    //        graphics.fillRect(position.x(), position.y(), Element.SIZE, Element.SIZE);
+    //    }
 
     public void draw(Figure figure) {
         for (Element element : figure.getElements()) {
@@ -63,6 +68,10 @@ public class TetrisView implements AutoCloseable {
         for (Element element : figure.getElements()) {
             clear(element);
         }
+    }
+
+    public void repaint() {
+        tetrisPanel.repaint();
     }
 
     public void close() {

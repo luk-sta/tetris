@@ -1,11 +1,15 @@
 package cz.hyperion.model;
 
+import java.util.UUID;
+
 public class Element {
     public static final int SIZE = 20;
+    private final String id;
     final Position position;
     final Color color;
 
     public Element(Position position, Color color) {
+        this.id= UUID.randomUUID().toString();
         this.position = position;
         this.color = color;
     }
@@ -28,6 +32,10 @@ public class Element {
 
     public Element moveRight() {
         return new Element(this, ElementShift.SHIFT_RIGHT);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public Position getPosition() {

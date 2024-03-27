@@ -103,6 +103,7 @@ public class FigureMovement implements KeyStrokes {
         tetrisView.clear(figure);
         figure = newFigure;
         tetrisView.draw(figure);
+        tetrisView.repaint();
         return true;
     }
 }

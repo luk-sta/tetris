@@ -84,6 +84,7 @@ public class Board {
                 elements[r][c] = newElement;
             }
         }
+        tetrisView.repaint();
     }
 
     public boolean isFigureInside(Figure figure) {
