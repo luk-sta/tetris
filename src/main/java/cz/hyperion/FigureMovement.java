@@ -8,6 +8,7 @@ import cz.hyperion.view.TetrisView;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class FigureMovement implements KeyStrokes {
     private final Board board;
@@ -18,8 +19,7 @@ public class FigureMovement implements KeyStrokes {
     private volatile Figure figure;
 
     private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
-
-    //    private final AtomicBoolean pause = new AtomicBoolean(false);
+    private final AtomicReference<Function<Figure, Figure>> lastRequestedAction = new AtomicReference<>();
 
     private enum State {
         RUNNING,
@@ -37,22 +37,22 @@ public class FigureMovement implements KeyStrokes {
 
     @Override
     public void keyLeft() {
-        newFigure(figure.moveLeft());
+        lastRequestedAction.set(Figure::moveLeft);
     }
 
     @Override
     public void keyRight() {
-        newFigure(figure.moveRight());
+        lastRequestedAction.set(Figure::moveRight);
     }
 
     @Override
     public void keyDown() {
-        newFigure(figure.rotateRight());
+        lastRequestedAction.set(Figure::rotateRight);
     }
 
     @Override
     public void keyUp() {
-        newFigure(figure.rotateLeft());
+        lastRequestedAction.set(Figure::rotateLeft);
     }
 
     @Override
@@ -88,10 +88,18 @@ public class FigureMovement implements KeyStrokes {
         do {
             checkGameState();
             Thread.sleep(sleep.get());
-        } while (newFigure(figure.moveDown()));
+        } while (move());
 
         board.addFigure(figure);
         sleep.set(baseSlowness - board.getPoints());
+    }
+
+    private boolean move() {
+        Function<Figure, Figure> action = lastRequestedAction.getAndSet(null);
+        if (action != null) {
+            newFigure(action.apply(figure));
+        }
+        return newFigure(figure.moveDown());
     }
 
     private void checkGameState() throws InterruptedException {
@@ -108,7 +116,7 @@ public class FigureMovement implements KeyStrokes {
 
     private boolean newFigure(Figure newFigure) {
         if (!board.isFigureInside(newFigure)) {
-//            System.out.println("New figure not inside.");
+            //            System.out.println("New figure not inside.");
             return false;
         }
         tetrisView.clear(figure);
