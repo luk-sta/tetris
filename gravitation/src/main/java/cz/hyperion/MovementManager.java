@@ -24,12 +24,12 @@ final class MovementManager {
 
     void move() {
         iter++;
-        if (iter % 100 == 0) {
-            double totalKineticEnergy = Arrays.stream(bodies).mapToDouble(Body::getKineticEnergy).sum();
-            double totalPotentialEnergy = computeTotalPotentialEnergy();
-            System.out.printf("Total energy: %f, kinetic: %f, potential: %f%n",
-                    (totalKineticEnergy + totalPotentialEnergy), totalKineticEnergy, totalPotentialEnergy);
-        }
+        //        if (iter % 100 == 0) {
+        //            double totalKineticEnergy = Arrays.stream(bodies).mapToDouble(Body::getKineticEnergy).sum();
+        //            double totalPotentialEnergy = computeTotalPotentialEnergy();
+        //            System.out.printf("Total energy: %f, kinetic: %f, potential: %f%n",
+        //                    (totalKineticEnergy + totalPotentialEnergy), totalKineticEnergy, totalPotentialEnergy);
+        //        }
         coef = 1;
         for (Body body : bodies) {
             double vx = Math.abs(body.velocity.x);
@@ -41,7 +41,7 @@ final class MovementManager {
                 coef = Math.max(coef, (int) Math.ceil(vy));
             }
         }
-        //        System.out.println(coef);
+        //                System.out.println(coef);
         for (int i = 0; i < coef; i++) {
             moveInt();
         }
@@ -55,14 +55,15 @@ final class MovementManager {
             for (int j = i + 1; j < bodies.length; j++) {
                 var body2 = bodies[j];
                 double distance = distance(body1, body2);
+                System.out.println("distance: " + distance);
                 //                double f = G_CONST * body1.mass * body2.mass / (distance * distance);
                 //                double g1 = f/body1.mass;
                 //                double g1 = G_CONST * body2.mass / (distance * distance);
                 //                double potentialEnergy = g1 * body1.mass * distance;
-                double potentialEnergy1 = G_CONST * body2.mass * body1.mass / distance;
+                double potentialEnergy1 = -1 * G_CONST * body2.mass * body1.mass / distance;
                 totalPotentialEnergy += potentialEnergy1;
-                double potentialEnergy2 = G_CONST * body1.mass * body2.mass / distance;
-                totalPotentialEnergy += potentialEnergy2;
+                //                double potentialEnergy2 = G_CONST * body1.mass * body2.mass / distance;
+                //                totalPotentialEnergy += potentialEnergy2;
             }
         }
         return totalPotentialEnergy;
@@ -70,15 +71,15 @@ final class MovementManager {
 
     private void moveInt() {
         for (int i = 0; i < bodies.length; i++) {
+            updatePosition(i);
+        }
+
+        for (int i = 0; i < bodies.length; i++) {
             var body1 = bodies[i];
             for (int j = i + 1; j < bodies.length; j++) {
                 var body2 = bodies[j];
                 updateVelocity(body1, body2);
             }
-        }
-
-        for (int i = 0; i < bodies.length; i++) {
-            updatePosition(i);
         }
     }
 
@@ -124,7 +125,7 @@ final class MovementManager {
         body2.velocity.y += accelerationY2 / coef;
     }
 
-    private void updatePosition(int bodyIndex) {
+    private boolean updatePosition(int bodyIndex) {
         var body = bodies[bodyIndex];
         double newX = body.position.x + body.velocity.x / coef;
         double newY = body.position.y + body.velocity.y / coef;
@@ -151,10 +152,11 @@ final class MovementManager {
             var body2 = bodies[j];
             double distance = distance(newPosition, body2.position);
             if (distance < BODY_SIZE) {
-                return;
+                return false;
             }
         }
         body.position = newPosition;
+        return true;
     }
 
     private static double distance(Vector v1, Vector v2) {
