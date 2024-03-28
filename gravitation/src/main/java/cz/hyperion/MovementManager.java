@@ -1,5 +1,7 @@
 package cz.hyperion;
 
+import java.util.Arrays;
+
 import static cz.hyperion.Body.BODY_SIZE;
 
 final class MovementManager {
@@ -22,6 +24,12 @@ final class MovementManager {
 
     void move() {
         iter++;
+        if (iter % 100 == 0) {
+            double totalKineticEnergy = Arrays.stream(bodies).mapToDouble(Body::getKineticEnergy).sum();
+            double totalPotentialEnergy = computeTotalPotentialEnergy();
+            System.out.printf("Total energy: %f, kinetic: %f, potential: %f%n",
+                    (totalKineticEnergy + totalPotentialEnergy), totalKineticEnergy, totalPotentialEnergy);
+        }
         coef = 1;
         for (Body body : bodies) {
             double vx = Math.abs(body.velocity.x);
@@ -40,6 +48,26 @@ final class MovementManager {
 
     }
 
+    private double computeTotalPotentialEnergy() {
+        double totalPotentialEnergy = 0;
+        for (int i = 0; i < bodies.length; i++) {
+            var body1 = bodies[i];
+            for (int j = i + 1; j < bodies.length; j++) {
+                var body2 = bodies[j];
+                double distance = distance(body1, body2);
+                //                double f = G_CONST * body1.mass * body2.mass / (distance * distance);
+                //                double g1 = f/body1.mass;
+                //                double g1 = G_CONST * body2.mass / (distance * distance);
+                //                double potentialEnergy = g1 * body1.mass * distance;
+                double potentialEnergy1 = G_CONST * body2.mass * body1.mass / distance;
+                totalPotentialEnergy += potentialEnergy1;
+                double potentialEnergy2 = G_CONST * body1.mass * body2.mass / distance;
+                totalPotentialEnergy += potentialEnergy2;
+            }
+        }
+        return totalPotentialEnergy;
+    }
+
     private void moveInt() {
         for (int i = 0; i < bodies.length; i++) {
             var body1 = bodies[i];
@@ -49,8 +77,8 @@ final class MovementManager {
             }
         }
 
-        for (Body body : bodies) {
-            updatePosition(body);
+        for (int i = 0; i < bodies.length; i++) {
+            updatePosition(i);
         }
     }
 
@@ -70,6 +98,7 @@ final class MovementManager {
                         body2.velocity.x,
                         body2.velocity.y,
                         coef, iter);
+                //                throw new RuntimeException("Collision");
             }
             passMomentumService.passMomentums(body1, body2);
             return;
@@ -95,24 +124,46 @@ final class MovementManager {
         body2.velocity.y += accelerationY2 / coef;
     }
 
-    private void updatePosition(Body body) {
-        body.position.x += body.velocity.x / coef;
-        if (body.position.x <= -1 * SIZE) {
-            body.position.x = -1 * SIZE;
+    private void updatePosition(int bodyIndex) {
+        var body = bodies[bodyIndex];
+        double newX = body.position.x + body.velocity.x / coef;
+        double newY = body.position.y + body.velocity.y / coef;
+
+        if (newX <= -1 * SIZE) {
+            newX = -1 * SIZE;
             body.velocity.x *= -1;
         }
-        if (body.position.x >= SIZE) {
-            body.position.x = SIZE;
+        if (newX >= SIZE) {
+            newX = SIZE;
             body.velocity.x *= -1;
         }
-        body.position.y += body.velocity.y / coef;
-        if (body.position.y <= -1 * SIZE) {
-            body.position.y = -1 * SIZE;
+        if (newY <= -1 * SIZE) {
+            newY = -1 * SIZE;
             body.velocity.y *= -1;
         }
-        if (body.position.y >= SIZE) {
-            body.position.y = SIZE;
+        if (newY >= SIZE) {
+            newY = SIZE;
             body.velocity.y *= -1;
         }
+
+        Vector newPosition = new Vector(newX, newY);
+        for (int j = 0; j < bodyIndex; j++) {
+            var body2 = bodies[j];
+            double distance = distance(newPosition, body2.position);
+            if (distance < BODY_SIZE) {
+                return;
+            }
+        }
+        body.position = newPosition;
     }
+
+    private static double distance(Vector v1, Vector v2) {
+        return Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2));
+    }
+
+    private static double distance(Body b1, Body b2) {
+        return distance(b1.position, b2.position);
+    }
+
+
 }

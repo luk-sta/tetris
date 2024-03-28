@@ -16,4 +16,5 @@ final class Vector {
     public double getY() {
         return y;
     }
+
 }

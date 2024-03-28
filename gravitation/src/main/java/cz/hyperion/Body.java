@@ -24,4 +24,8 @@ class Body {
     Vector getMomentum() {
         return new Vector(velocity.x * mass, velocity.y * mass);
     }
+
+    public double getKineticEnergy() {
+        return 0.5 * mass * (velocity.x * velocity.x + velocity.y * velocity.y);
+    }
 }

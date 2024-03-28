@@ -9,37 +9,40 @@ final class PassMomentumService {
         if (body1.passedMomentumWith.contains(body2)) {
             return;
         }
+//        System.out.println("Passing momentum");
         Vector momentum1 = body1.getMomentum();
         Vector momentum2 = body2.getMomentum();
         Optional<Boolean> elasticCollisionX = isElasticCollision(body1, body2, Vector::getX);
         if (elasticCollisionX.isEmpty()) {
+            //System.out.println("No collision x");
             //nothing
         } else if (elasticCollisionX.get()) {
             body1.velocity.x = momentum2.x / body1.mass;
             body2.velocity.x = momentum1.x / body2.mass;
         } else if (Math.abs(body1.velocity.x) >= Math.abs(body2.velocity.x)) {
             double equalVelocity = (momentum1.x + momentum2.x) / (body1.mass + body2.mass);
-            body1.velocity.x = 0.5 * equalVelocity;
+            body1.velocity.x = 0.1 * equalVelocity;
             body2.velocity.x = ((momentum1.x + momentum2.x) - body1.velocity.x * body1.mass) / body2.mass;
         } else {
             double equalVelocity = (momentum1.x + momentum2.x) / (body1.mass + body2.mass);
-            body2.velocity.x = 0.5 * equalVelocity;
+            body2.velocity.x = 0.1 * equalVelocity;
             body1.velocity.x = ((momentum1.x + momentum2.x) - body2.velocity.x * body2.mass) / body1.mass;
         }
 
         Optional<Boolean> elasticCollisionY = isElasticCollision(body1, body2, Vector::getY);
         if (elasticCollisionY.isEmpty()) {
+            //System.out.println("No collision y");
             //nothing
         } else if (elasticCollisionY.get()) {
             body1.velocity.y = momentum2.y / body1.mass;
             body2.velocity.y = momentum1.y / body2.mass;
         } else if (Math.abs(body1.velocity.y) >= Math.abs(body2.velocity.y)) {
             double equalVelocity = (momentum1.y + momentum2.y) / (body1.mass + body2.mass);
-            body1.velocity.y = 0.5 * equalVelocity;
+            body1.velocity.y = 0.1 * equalVelocity;
             body2.velocity.y = ((momentum1.y + momentum2.y) - body1.velocity.y * body1.mass) / body2.mass;
         } else {
             double equalVelocity = (momentum1.y + momentum2.y) / (body1.mass + body2.mass);
-            body2.velocity.y = 0.5 * equalVelocity;
+            body2.velocity.y = 0.1 * equalVelocity;
             body1.velocity.y = ((momentum1.y + momentum2.y) - body2.velocity.y * body2.mass) / body1.mass;
         }
 
