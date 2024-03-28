@@ -17,4 +17,7 @@ final class Vector {
         return y;
     }
 
+   double getLength() {
+        return Math.sqrt(x * x + y * y);
+    }
 }

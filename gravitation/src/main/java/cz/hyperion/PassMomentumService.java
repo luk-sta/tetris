@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 final class PassMomentumService {
 
-    static final double MOMENTUM_PRESERVATION_COEF = 0.1;
+    static final double MOMENTUM_PRESERVATION_COEF = 0.5;
 
     void passMomentums(Body body1, Body body2) {
         if (body1.passedMomentumWith.contains(body2)) {
@@ -16,7 +16,7 @@ final class PassMomentumService {
         Vector momentum2 = body2.getMomentum();
         Optional<Boolean> elasticCollisionX = isElasticCollision(body1, body2, Vector::getX);
         if (elasticCollisionX.isEmpty()) {
-            //System.out.println("No collision x");
+            System.out.println("No collision x");
             //nothing
         } else if (elasticCollisionX.get()) {
             body1.velocity.x = MOMENTUM_PRESERVATION_COEF * momentum2.x / body1.mass;
@@ -35,11 +35,11 @@ final class PassMomentumService {
 
         Optional<Boolean> elasticCollisionY = isElasticCollision(body1, body2, Vector::getY);
         if (elasticCollisionY.isEmpty()) {
-            //System.out.println("No collision y");
+            System.out.println("No collision y");
             //nothing
         } else if (elasticCollisionY.get()) {
-            body1.velocity.y = momentum2.y / body1.mass;
-            body2.velocity.y = momentum1.y / body2.mass;
+            body1.velocity.y = MOMENTUM_PRESERVATION_COEF * momentum2.y / body1.mass;
+            body2.velocity.y = MOMENTUM_PRESERVATION_COEF * momentum1.y / body2.mass;
         } else if (Math.abs(body1.velocity.y) >= Math.abs(body2.velocity.y)) {
             double preserveTotalMomentum = MOMENTUM_PRESERVATION_COEF * (momentum1.y + momentum2.y);
             double equalVelocity = preserveTotalMomentum / (body1.mass + body2.mass);

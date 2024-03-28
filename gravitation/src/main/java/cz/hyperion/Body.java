@@ -9,8 +9,9 @@ class Body {
     public static final int BODY_CIRCLE_RADIUS = BODY_SIZE / 2;
     volatile Vector position;
     Vector velocity;
-    public double mass;
-    public final Color color;
+    double mass;
+    final Color color;
+
 
     public final Set<Body> passedMomentumWith = new HashSet<>();
 

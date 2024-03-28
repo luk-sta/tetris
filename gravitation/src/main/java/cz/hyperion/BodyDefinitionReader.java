@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 final class BodyDefinitionReader {
-    static Body[] readBodies(String csvFileName) throws IOException {
+    static List<Body> readBodies(String csvFileName) throws IOException {
         final URL definitionCsvUrl = ClassLoader.getSystemResource(csvFileName);
         List<Body> bodies = new ArrayList<>();
         try (var inputStream = definitionCsvUrl.openStream(); Scanner scanner = new Scanner(inputStream)) {
@@ -27,6 +27,6 @@ final class BodyDefinitionReader {
                 bodies.add(new Body(x, y, vx, vy, mass, color));
             }
         }
-        return bodies.toArray(new Body[0]);
+        return bodies;
     }
 }
