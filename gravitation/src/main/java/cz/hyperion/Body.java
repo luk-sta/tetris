@@ -12,7 +12,7 @@ class Body {
     public final double mass;
     public final Color color;
 
-    public final Set<Body> swappedMomentumWith = new HashSet<>();
+    public final Set<Body> passedMomentumWith = new HashSet<>();
 
     public Body(double x, double y, double vx, double vy, double mass, Color color) {
         this.position = new Vector(x, y);

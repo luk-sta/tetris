@@ -6,17 +6,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-public class MainView implements AutoCloseable {
+class MainView implements AutoCloseable {
     private static final Color BACKGROUND_COLOR = Color.WHITE;
     static final int WIDTH = MovementManager.SIZE * 2;
     static final int HEIGHT = MovementManager.SIZE * 2;
     private final JFrame jFrame;
     private final Timer tm;
 
-    public MainView(MovementManager movementManager) {
+    MainView(MovementManager movementManager) {
         jFrame = new JFrame();
         jFrame.setBackground(Color.WHITE);
-        jFrame.setSize(WIDTH, HEIGHT + 40);
+        jFrame.setSize(WIDTH + 10, HEIGHT + 40);
         jFrame.setTitle("Gravitation");
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
