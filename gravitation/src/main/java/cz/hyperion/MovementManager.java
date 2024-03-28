@@ -1,14 +1,12 @@
 package cz.hyperion;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import static cz.hyperion.Body.BODY_SIZE;
 
 final class MovementManager {
     public static final int SIZE = 500;
     private static final double G_CONST = 1;
 
+    private final PassMomentumService passMomentumService = new PassMomentumService();
     private final Body[] bodies;
 
     private int coef = 1;
@@ -73,7 +71,7 @@ final class MovementManager {
                         body2.velocity.y,
                         coef, iter);
             }
-            passMomentums(body1, body2);
+            passMomentumService.passMomentums(body1, body2);
             return;
         }
         body1.passedMomentumWith.remove(body2);
@@ -95,86 +93,6 @@ final class MovementManager {
 
         body2.velocity.x += accelerationX2 / coef;
         body2.velocity.y += accelerationY2 / coef;
-    }
-
-    private void passMomentums(Body body1, Body body2) {
-        if (body1.passedMomentumWith.contains(body2)) {
-            return;
-        }
-        Vector momentum1 = body1.getMomentum();
-        Vector momentum2 = body2.getMomentum();
-        Optional<Boolean> elasticCollisionX = elasticCollision(body1, body2, Vector::getX);
-        if (elasticCollisionX.isEmpty()) {
-            //nothing
-        } else if (elasticCollisionX.get()) {
-            body1.velocity.x = momentum2.x / body1.mass;
-            body2.velocity.x = momentum1.x / body2.mass;
-        } else if (Math.abs(body1.velocity.x) >= Math.abs(body2.velocity.x)) {
-            body1.velocity.x = 0;
-            body2.velocity.x = (momentum1.x + momentum2.x) / (body1.mass + body2.mass);
-        } else {
-            body1.velocity.x = (momentum1.x + momentum2.x) / (body1.mass + body2.mass);
-            body2.velocity.x = 0;
-        }
-
-        Optional<Boolean> elasticCollisionY = elasticCollision(body1, body2, Vector::getY);
-        if (elasticCollisionY.isEmpty()) {
-            //nothing
-        } else if (elasticCollisionY.get()) {
-            body1.velocity.y = momentum2.y / body1.mass;
-            body2.velocity.y = momentum1.y / body2.mass;
-        } else if (Math.abs(body1.velocity.y) >= Math.abs(body2.velocity.y)) {
-            body1.velocity.y = 0;
-            body2.velocity.y = (momentum1.y + momentum2.y) / (body1.mass + body2.mass);
-        } else {
-            body1.velocity.y = (momentum1.y + momentum2.y) / (body1.mass + body2.mass);
-            body2.velocity.y = 0;
-        }
-
-        if (elasticCollisionX.isPresent() || elasticCollisionY.isPresent()) {
-            body1.passedMomentumWith.add(body2);
-//            System.out.println("Passed momentum");
-        }
-    }
-
-    private Optional<Boolean> elasticCollision(Body body1, Body body2, Function<Vector, Double> getter) {
-        if (getter.apply(body1.velocity) >= 0 && getter.apply(body2.velocity) <= 0) {
-            if (getter.apply(body1.position) < getter.apply(body2.position)) {
-                return Optional.of(true);
-            } else {
-                return Optional.empty();
-            }
-        }
-        if (getter.apply(body1.velocity) <= 0 && getter.apply(body2.velocity) >= 0) {
-            if (getter.apply(body1.position) > getter.apply(body2.position)) {
-                return Optional.of(true);
-            } else {
-                return Optional.empty();
-            }
-        }
-        if (getter.apply(body1.velocity) >= 0 && getter.apply(body2.velocity) >= 0) {
-            if (getter.apply(body1.position) < getter.apply(body2.position)
-                    && getter.apply(body1.velocity) > getter.apply(body2.velocity)) {
-                return Optional.of(body1.mass >= body2.mass);
-            } else if (getter.apply(body1.position) > getter.apply(body2.position)
-                    && getter.apply(body1.velocity) < getter.apply(body2.velocity)) {
-                return Optional.of(body1.mass <= body2.mass);
-            } else {
-                return Optional.empty();
-            }
-        }
-        if (getter.apply(body1.velocity) <= 0 && getter.apply(body2.velocity) <= 0) {
-            if (getter.apply(body1.position) < getter.apply(body2.position)
-                    && getter.apply(body1.velocity) > getter.apply(body2.velocity)) {
-                return Optional.of(body1.mass <= body2.mass);
-            } else if (getter.apply(body1.position) > getter.apply(body2.position)
-                    && getter.apply(body1.velocity) < getter.apply(body2.velocity)) {
-                return Optional.of(body1.mass >= body2.mass);
-            } else {
-                return Optional.empty();
-            }
-        }
-        return Optional.empty();
     }
 
     private void updatePosition(Body body) {
